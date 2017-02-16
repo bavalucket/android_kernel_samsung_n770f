@@ -67,6 +67,12 @@ struct ctl_table_header;
  */
 #define BPF_SYM_ELF_TYPE	't'
 
+/* As per nm, we expose JITed images as text (code) section for
+ * kallsyms. That way, tools like perf can find it to match
+ * addresses.
+ */
+#define BPF_SYM_ELF_TYPE	't'
+
 /* BPF program can access up to 512 bytes of stack space. */
 #define MAX_BPF_STACK	512
 
@@ -754,6 +760,11 @@ static inline void bpf_jit_binary_unlock_ro(struct bpf_binary_header *hdr)
 {
 	WARN_ON_ONCE(set_memory_rw((unsigned long)hdr, hdr->pages));
 }
+
+static inline void bpf_jit_binary_unlock_ro(struct bpf_binary_header *hdr)
+{
+	set_memory_rw((unsigned long)hdr, hdr->pages);
+}
 #else
 static inline void bpf_prog_lock_ro(struct bpf_prog *fp)
 {
@@ -763,14 +774,10 @@ static inline void bpf_prog_unlock_ro(struct bpf_prog *fp)
 {
 }
 
-static inline void bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-{
-}
-
 static inline void bpf_jit_binary_unlock_ro(struct bpf_binary_header *hdr)
 {
 }
-#endif /* CONFIG_ARCH_HAS_SET_MEMORY */
+#endif /* CONFIG_DEBUG_SET_MODULE_RONX */
 
 static inline struct bpf_binary_header *
 bpf_jit_binary_hdr(const struct bpf_prog *fp)
@@ -940,7 +947,6 @@ static inline bool bpf_jit_blinding_enabled(struct bpf_prog *prog)
 
 	return true;
 }
-<<<<<<< HEAD
 
 static inline bool bpf_jit_kallsyms_enabled(void)
 {
@@ -979,19 +985,11 @@ void bpf_prog_kallsyms_del(struct bpf_prog *fp);
 
 #else /* CONFIG_BPF_JIT */
 
-static inline bool ebpf_jit_enabled(void)
-{
-	return false;
-}
-
 static inline bool bpf_prog_ebpf_jited(const struct bpf_prog *fp)
 {
 	return false;
 }
 
-=======
-#else
->>>>>>> 915d75bbe (bpf: remove stubs for cBPF from arch code)
 static inline void bpf_jit_free(struct bpf_prog *fp)
 {
 	bpf_prog_unlock_free(fp);

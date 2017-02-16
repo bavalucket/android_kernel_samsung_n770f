@@ -980,7 +980,6 @@ static void __bpf_prog_put(struct bpf_prog *prog, bool do_idr_lock)
 		for (i = 0; i < prog->aux->func_cnt; i++)
 			bpf_prog_kallsyms_del(prog->aux->func[i]);
 		bpf_prog_kallsyms_del(prog);
-
 		call_rcu(&prog->aux->rcu, __bpf_prog_put_rcu);
 	}
 }
