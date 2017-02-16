@@ -940,6 +940,7 @@ static inline bool bpf_jit_blinding_enabled(struct bpf_prog *prog)
 
 	return true;
 }
+<<<<<<< HEAD
 
 static inline bool bpf_jit_kallsyms_enabled(void)
 {
@@ -988,6 +989,9 @@ static inline bool bpf_prog_ebpf_jited(const struct bpf_prog *fp)
 	return false;
 }
 
+=======
+#else
+>>>>>>> 915d75bbe (bpf: remove stubs for cBPF from arch code)
 static inline void bpf_jit_free(struct bpf_prog *fp)
 {
 	bpf_prog_unlock_free(fp);
