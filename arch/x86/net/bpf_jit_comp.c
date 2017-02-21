@@ -1206,16 +1206,7 @@ skip_init_addrs:
 		bpf_jit_dump(prog->len, proglen, pass + 1, image);
 
 	if (image) {
-		bpf_flush_icache(header, image + proglen);
-		if (!prog->is_func || extra_pass) {
-			bpf_jit_binary_lock_ro(header);
-		} else {
-			jit_data->addrs = addrs;
-			jit_data->ctx = ctx;
-			jit_data->proglen = proglen;
-			jit_data->image = image;
-			jit_data->header = header;
-		}
+		bpf_jit_binary_lock_ro(header);
 		prog->bpf_func = (void *)image;
 		prog->jited = 1;
 		prog->jited_len = proglen;
