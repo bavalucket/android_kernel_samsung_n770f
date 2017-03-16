@@ -997,6 +997,11 @@ void bpf_prog_kallsyms_del(struct bpf_prog *fp);
 
 #else /* CONFIG_BPF_JIT */
 
+static inline bool ebpf_jit_enabled(void)
+{
+	return false;
+}
+
 static inline bool bpf_prog_ebpf_jited(const struct bpf_prog *fp)
 {
 	return false;
