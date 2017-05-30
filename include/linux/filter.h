@@ -67,6 +67,9 @@ struct ctl_table_header;
  */
 #define BPF_SYM_ELF_TYPE	't'
 
+/* unused opcode to mark special call to bpf_tail_call() helper */
+#define BPF_TAIL_CALL	0xf0
+
 /* As per nm, we expose JITed images as text (code) section for
  * kallsyms. That way, tools like perf can find it to match
  * addresses.
