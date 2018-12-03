@@ -302,12 +302,14 @@ const struct cred *get_task_cred(struct task_struct *task)
 	do {
 		cred = __task_cred((task));
 		BUG_ON(!cred);
-	} while (!atomic_inc_not_zero(&((struct cred *)cred)->usage));
-#endif /*CONFIG_RKP_KDP*/
-	rcu_read_unlock();
-	return cred;
+#ifdef CONFIG_RKP_KDP  // Preserve Samsung-specific KDP logic if needed
+        } while (!get_cred_rcu(cred));
+#else
+        } while (!get_cred_rcu(cred));
+#endif /* CONFIG_RKP_KDP */
+        rcu_read_unlock();
+        return cred;
 }
-
 /*
  * Allocate blank credentials, such that the credentials can be filled in at a
  * later date without risk of ENOMEM.
