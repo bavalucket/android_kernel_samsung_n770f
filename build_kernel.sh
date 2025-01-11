@@ -5,6 +5,8 @@ export PLATFORM_VERSION=13
 export ANDROID_MAJOR_VERSION=t
 export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 
+echo 'getting build tools';
+./setup_repos.sh
 echo 'cleaning old build';
 make mrproper
 echo 'making defconfig'
