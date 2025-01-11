@@ -5,6 +5,8 @@
 >- I'm not responsible for anything this is as-is code ,use at your own RISK!.
 >- sell it or trade it with s20fe they have same price point in my region atleast or any other model.
 >- vault keeper errors on build .
+>- kperfmon_DUMMY warnings are normal
+>- BUILD TOOLS FOR THIS KERNEL ARE DOWNLOADED WHEN USING BUILD_KERNEL.SH ,and they also exists in git account. 
 
 To build, run these commands;
 
