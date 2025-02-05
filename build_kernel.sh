@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export ARCH=arm64
+export PLATFORM_VERSION=13
+export ANDROID_MAJOR_VERSION=t
+export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
+
+make ARCH=arm64 -j8
