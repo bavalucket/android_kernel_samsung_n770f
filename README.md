@@ -15,6 +15,11 @@ recommended: clear cache and dalvik art
 Enjoy!
 
 ### Notes
+🔴: Please add the '--recurse-submodules' flag when cloning
+
+```
+git clone --recurse-submodules https://github.com/bavalucket/android_kernel_samsung_n770f.git
+```
 
 🔴: Fatal, 🟡: Not advised, 🟢: Permissible.
 # Installation:
