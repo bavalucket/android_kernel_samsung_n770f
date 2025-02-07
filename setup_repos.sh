@@ -14,16 +14,17 @@ fi
 clone_if_not_existing() {
     local repo_url="$1"
     local repo_branch="$2"
-    if [ -z ${3+x} ]; then
-        local repo_name="${repo_url##*/}"
-    else
-        local repo_name="$3"
+    local repo_name="${3:-${repo_url##*/}}"
+
+    if [ -d "$tools_root/$repo_name" ]; then
+        print_info "$repo_name - already exists, skipping download"
+        return 0
     fi
 
-    if [ -d "$tools_root/""$repo_name" ]; then
-        print_info "$repo_name - already exists, skipping download"
-    else
-	git clone "$repo_url" -b "$repo_branch" --depth 1 --recursive "$tools_root/$repo_name"
+    # Try shallow clone first, fallback to full clone
+    if ! git clone "$repo_url" -b "$repo_branch" --depth 1 --recursive "$tools_root/$repo_name"; then
+        print_info "Shallow clone failed, attempting full clone..."
+        git clone "$repo_url" -b "$repo_branch" --recursive "$tools_root/$repo_name"
     fi
 }
 
