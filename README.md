@@ -15,6 +15,7 @@ Enjoy!
 # Installation:
 
 🔴: SuSfs isn't enabled as it needs further development
+
 🟡: Overlayfs can't be used while modules are mounted without further development
 
 # Compilation:
