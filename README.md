@@ -23,22 +23,41 @@ Enjoy!
 
 🟡: Overlayfs can't be used while modules are mounted without further development
 
-# Compilation:
-🟡: No patch history - not yet added
 
-🔴: **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
 
-🟢: Can enable/disable magic mount in menuconfig
 
-🟢: Thou shall NOT enable SUS_SU (without further patches)
 
-🟢: After successful compilation do the following:
 
-1: Copy the Image from arch/arm64/boot/Image
+### Compilation:
 
-2: Paste it into Android Image Kitchen
+Clone the repo using the "--recurse-submodules" flag
 
-3: Boot! 
+```
+git clone --recurse-submodules https://github.com/bavalucket/android_kernel_samsung_n770f.git
+```
+
+and then CD into the directory & run the automated 'build_kernel.sh'
+
+```
+bash build_kernel.sh
+```
+## Notes:
+
+- No patch history - not yet added
+
+- **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
+
+- Can enable/disable magic mount in menuconfig
+
+- Thou shall NOT enable SUS_SU (without further patches)
+
+- After successful compilation do the following:
+
+- Copy the Image from arch/arm64/boot/Image
+
+- Paste it into Android Image Kitchen
+
+- Boot! 
 
 ### BUG Reporting & features:
 
