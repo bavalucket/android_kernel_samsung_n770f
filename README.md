@@ -4,7 +4,7 @@ KernelSU-Next Compatible kernel for samsung galaxy note 10 lite
 
 ### Installation steps:
 
-Back up all modules (they will be permanently deleted once you install KernelSU-Next)
+Back up all previous modules (they will be permanently deleted once you install KernelSU-Next)
 
 Download the latest boot.img
 
