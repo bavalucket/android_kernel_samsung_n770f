@@ -11,23 +11,23 @@ Enjoy!
 
 ### Notes
 
-
+🔴: Fatal, 🟡: Not advised, 🟢: Permissible.
 # Installation:
 
-🔴: SuSfs isn't enabled as it needs further development\n
-🟡: Overlayfs can't be used while modules are mounted without further development\n
+🔴: SuSfs isn't enabled as it needs further development
+🟡: Overlayfs can't be used while modules are mounted without further development
 
 # Compilation:
-🟡: No patch history - not yet added\n
-🔴: **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."\n
-🟢: Can enable/disable magic mount in menuconfig\n
-🟢: Thou shall NOT enable SUS_SU (without further patches)\n
-🟢: After successful compilation do the following:\n
-1: Copy the Image from arch/arm64/boot/Image\n
-2: Paste it into Android Image Kitchen\n
-3: Boot! \n
+🟡: No patch history - not yet added
+🔴: **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
+🟢: Can enable/disable magic mount in menuconfig
+🟢: Thou shall NOT enable SUS_SU (without further patches)
+🟢: After successful compilation do the following:
+1: Copy the Image from arch/arm64/boot/Image
+2: Paste it into Android Image Kitchen
+3: Boot! 
 
 ### BUG Reporting & features:
 
-In case of a bug feel free to publish a bug report on this repo.\n
+In case of a bug feel free to publish a bug report on this repo.
 If you want to request an additional feature feel free to do so.
