@@ -45,6 +45,12 @@ bash build_kernel.sh
 
 - No patch history - not yet added
 
+- "setup_repos.sh" might fail due to an HTTP/2 error, in which case you should rerun the script
+
+```
+./setup_repos.sh
+```
+
 - **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
 
 - Can enable/disable magic mount in menuconfig
