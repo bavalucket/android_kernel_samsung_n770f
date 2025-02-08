@@ -22,8 +22,7 @@ Enjoy!
 
 🟡: Overlayfs can't be used while modules are mounted without further development
 
-
-
+🟢: (DEV) get_cred_rcu() is [bypassed](https://github.com/bavalucket/KernelSU-Next/commit/a55b01ca98602f26f856d2dabb086a880cec26b9) rather than ported
 
 
 
