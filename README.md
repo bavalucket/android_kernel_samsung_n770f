@@ -14,7 +14,7 @@ recommended: clear cache and dalvik art
 
 Enjoy!
 
-# Notes
+## Notes
 
 🔴: Fatal, 🟡: Not advised, 🟢: Permissible.
 
@@ -27,7 +27,7 @@ Enjoy!
 
 
 
-### Compilation:
+# Compilation:
 
 Clone the repo using the "--recurse-submodules" flag
 
@@ -64,7 +64,7 @@ bash build_kernel.sh
 
 - Boot! 
 
-### BUG Reporting & features:
+## BUG Reporting & features:
 
 In case of a bug feel free to publish a bug report on this repo.
 
