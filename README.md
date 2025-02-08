@@ -53,7 +53,7 @@ bash build_kernel.sh
 
 - **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
 
-- Can enable/disable magic mount in menuconfig
+- Keep in mind overlayfs is unstable
 
 - Thou shall NOT enable SUS_SU (without further patches)
 
