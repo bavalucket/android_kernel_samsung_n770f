@@ -18,7 +18,7 @@ Enjoy!
 
 🔴: Fatal, 🟡: Not advised, 🟢: Permissible.
 
-🔴: SuSfs isn't enabled as it needs further development
+🟡🟢: SuSfs is enabled for production builds
 
 🟡: Overlayfs can't be used while modules are mounted without further development
 
@@ -52,8 +52,6 @@ bash build_kernel.sh
 - **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
 
 - Keep in mind overlayfs is unstable
-
-- Thou shall NOT enable SUS_SU (without further patches)
 
 - After successful compilation do the following:
 
