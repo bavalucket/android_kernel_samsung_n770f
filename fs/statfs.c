@@ -77,9 +77,9 @@ int vfs_statfs(struct path *path, struct kstatfs *buf)
 	if (likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
 		for (; mnt->mnt_id >= DEFAULT_SUS_MNT_ID; mnt = mnt->mnt_parent) {}
 	}
-	error = statfs_by_dentry(mnt->mnt->mnt_root, buf);
+	error = statfs_by_dentry(mnt->mnt.mnt_root, buf);
 	if (!error)
-		buf->f_flags = calculate_f_flags(mnt->mnt);
+		buf->f_flags = calculate_f_flags(&mnt->mnt);
 	return error;
 #else
 	error = statfs_by_dentry(path->dentry, buf);
