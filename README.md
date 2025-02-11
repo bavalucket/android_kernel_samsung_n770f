@@ -66,3 +66,12 @@ bash build_kernel.sh
 In case of a bug feel free to publish a bug report on this repo.
 
 If you want to request an additional feature feel free to do so.
+
+## Credits
+
+- [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/): the KernelSU idea.
+- [Magisk](https://github.com/topjohnwu/Magisk): the powerful root tool.
+- [genuine](https://github.com/brevent/genuine/): apk v2 signature validation.
+- [Diamorphine](https://github.com/m0nad/Diamorphine): some rootkit skills.
+- [KernelSU](https://github.com/tiann/KernelSU): thanks to tiann, or else KernelSU Next wouldn't even exist.
+- [Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs): 💜 5ec1cff for saving KernelSU!
