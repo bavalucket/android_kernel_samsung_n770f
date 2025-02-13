@@ -2,3 +2,7 @@
 	path = KernelSU-Next
 	url = https://github.com/rifsxd/KernelSU-Next.git
 	branch = next-susfs
+[submodule "susfs4ksu"]
+	path = susfs4ksu
+	url = https://gitlab.com/simonpunk/susfs4ksu.git
+	branch = kernel-4.9
