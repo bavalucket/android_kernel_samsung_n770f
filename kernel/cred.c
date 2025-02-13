@@ -285,26 +285,23 @@ const struct cred *get_task_cred(struct task_struct *task)
 	const struct cred *cred;
 #ifdef CONFIG_RKP_KDP
 	int inc_test;
-#endif /*CONFIG_RKP_KDP*/
+#endif
 	rcu_read_lock();
 
 #ifdef CONFIG_RKP_KDP
-	do {
-		cred = __task_cred((task));
-		BUG_ON(!cred);
-		if (rkp_ro_page((unsigned long)cred)) {
-			inc_test = rocred_uc_inc_not_zero(cred);
-		}
-		else
-			inc_test = atomic_inc_not_zero(&((struct cred *)cred)->usage);
-	} while (!inc_test);
+        do {
+                cred = __task_cred((task));
+                BUG_ON(!cred);
+                if (rkp_ro_page((unsigned long)cred)) {
+                        inc_test = rocred_uc_inc_not_zero(cred);
+                } else {
+                        inc_test = atomic_inc_not_zero(&((struct cred *)cred)->usage);
+                }
+        } while (!inc_test);
 #else
-	do {
-		cred = __task_cred((task));
-		BUG_ON(!cred);
-#ifdef CONFIG_RKP_KDP  // Preserve Samsung-specific KDP logic if needed
-        } while (!get_cred_rcu(cred));
-#else
+        do {
+                cred = __task_cred((task));
+                BUG_ON(!cred);
         } while (!get_cred_rcu(cred));
 #endif /* CONFIG_RKP_KDP */
         rcu_read_unlock();
@@ -1244,4 +1241,4 @@ void validate_creds_for_do_exit(struct task_struct *tsk)
 	__validate_process_creds(tsk, __FILE__, __LINE__);
 }
 
-#endif /* CONFIG_DEBUG_CREDENTIALS */
+#endif
