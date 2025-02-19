@@ -6,7 +6,7 @@ KernelSU-Next Compatible kernel for samsung galaxy note 10 lite
 
 Back up all previous modules (they will be permanently deleted once you install KernelSU-Next)
 
-Download the [latest boot.img](https://github.com/bavalucket/android_kernel_samsung_n770f/releases/tag/releases)
+Download the latest [boot.img](https://github.com/bavalucket/android_kernel_samsung_n770f/releases/)
 
 Flash it through TWRP/Odin/heimdall/...
 
