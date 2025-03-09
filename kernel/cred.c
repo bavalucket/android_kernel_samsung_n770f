@@ -299,10 +299,10 @@ const struct cred *get_task_cred(struct task_struct *task)
 			inc_test = atomic_inc_not_zero(&((struct cred *)cred)->usage);
 	} while (!inc_test);
 #else
-	do {
-		cred = __task_cred((task));
-		BUG_ON(!cred);
-	} while (!get_cred_rcu(cred));
+        do {
+                cred = __task_cred((task));
+                BUG_ON(!cred);
+        } while (!atomic_inc_not_zero(&cred->usage));
 #endif /*CONFIG_RKP_KDP*/
 	rcu_read_unlock();
 	return cred;
