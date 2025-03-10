@@ -1,6 +1,8 @@
-# kernel_samsung_N770F
+# About
 
-KernelSU-Next Compatible kernel for samsung galaxy note 10 lite
+This repository contains a community-supported kernel for the Galaxy Note 10 Lite, compatible with KernelSU-Next.
+
+
 
 # Installation steps:
 
@@ -14,15 +16,14 @@ recommended: clear cache and dalvik art
 
 Enjoy!
 
-## Notes
 
-🔴: Fatal, 🟡: Not advised, 🟢: Permissible.
+### Installation Notes
 
-🟡🟢: SuSfs is enabled for production builds
+- SuSfs is enabled for production builds
 
-🟡: Overlayfs can't be used while modules are mounted without further development
+- Stock rom users might face some problems with Overlayfs
 
-🟢: (DEV) get_cred_rcu() is [bypassed](https://github.com/bavalucket/KernelSU-Next/commit/a55b01ca98602f26f856d2dabb086a880cec26b9) rather than ported
+- It's recommended to install pre-release kernels as they contain more features
 
 
 
@@ -39,7 +40,9 @@ and then CD into the directory & run the automated 'build_kernel.sh'
 ```
 bash build_kernel.sh
 ```
-## Notes:
+
+
+### Compilation Notes:
 
 - No patch history - not yet added
 
@@ -49,7 +52,9 @@ bash build_kernel.sh
 ./setup_repos.sh
 ```
 
-- **MUST** disable RKP, Uh, and KDP, Otherwise known as "scamsong's b.s."
+- (DEV) get_cred_rcu() is [bypassed](https://github.com/bavalucket/KernelSU-Next/commit/a55b01ca98602f26f856d2dabb086a880cec26b9) rather than ported
+
+- **MUST** disable RKP, Uh, and KDP, Otherwise known as "Scamsung's b.s."
 
 - Keep in mind overlayfs is unstable
 
@@ -61,11 +66,15 @@ bash build_kernel.sh
 
 - Boot! 
 
+
+
 ## BUG Reporting & features:
 
 In case of a bug feel free to publish a bug report on this repo.
 
-If you want to request an additional feature feel free to do so.
+If you want to request an additional feature or publish a Pull Request feel free to do so.
+
+
 
 ## Credits
 
