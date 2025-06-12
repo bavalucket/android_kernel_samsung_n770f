@@ -758,7 +758,16 @@ static void simulate_WRITE_RO(char *arg)
 #else
 	ptr = (unsigned long *)simulate_WRITE_RO;
 #endif
-	*ptr ^= 0x12345678;
+    {
+        unsigned long val = *ptr ^ 0x12345678;
+        /* register‐indirect store avoids LO12 relocation */
+        asm volatile(
+            "str %0, [%1]\n"
+            : /* no outputs */
+            : "r"(val), "r"(ptr)
+            : "memory"
+        );
+    }
 }
 
 #define BUFFER_SIZE SZ_1K
