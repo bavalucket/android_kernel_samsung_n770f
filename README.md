@@ -23,8 +23,6 @@ Enjoy!
 
 - Stock rom users might face some problems with Overlayfs
 
-- It's recommended to install pre-release kernels as they contain more features
-
 
 
 # Compilation:
