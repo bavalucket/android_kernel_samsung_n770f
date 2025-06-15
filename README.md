@@ -14,6 +14,8 @@ Flash it through TWRP/Odin/heimdall/...
 
 recommended: clear cache and dalvik art
 
+Download the KernelSU-Next Manager from github to manage your root access
+
 Enjoy!
 
 
