@@ -95,7 +95,13 @@
 
 #ifdef CONFIG_UH
 #include <linux/uh.h>
+#ifdef CONFIG_KVM
+#error "UH and KVM cannot coexist!"
+#endif
 #ifdef CONFIG_UH_RKP
+#ifdef CONFIG_KVM
+#error "RKP and KVM cannot coexist!"
+#endif
 #include <linux/rkp.h>
 #ifdef CONFIG_RKP_KDP
 #include <linux/kdp.h>
@@ -763,6 +769,10 @@ asmlinkage __visible void __init start_kernel(void)
 	sort_main_extable();
 	trap_init();
 	mm_init();
+#ifdef CONFIG_KVM
+    void preinit_hyp_mode(void);
+    preinit_hyp_mode();
+#endif
 #ifdef CONFIG_UH
 	uh_init();
 #ifdef CONFIG_UH_RKP
