@@ -1079,25 +1079,47 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		return -EINVAL;
 	}
 }
+// insertion start
+static unsigned long hyp_stack_base;
+
+// Complete and proper declaration
+void uh_init_kvm(phys_addr_t code, phys_addr_t boot_pgd_ptr, phys_addr_t pgd_ptr, unsigned long hyp_stack_ptr, unsigned long vector_ptr);
 
 static void cpu_init_hyp_mode(void *dummy)
 {
-	phys_addr_t pgd_ptr;
-	unsigned long hyp_stack_ptr;
-	unsigned long stack_page;
-	unsigned long vector_ptr;
+    phys_addr_t boot_pgd_ptr;
+    phys_addr_t pgd_ptr;
+    unsigned long hyp_stack_ptr;
+    unsigned long stack_page;
+    unsigned long vector_ptr;
 
-	/* Switch from the HYP stub to our own HYP init vector */
-	__hyp_set_vectors(kvm_get_idmap_vector());
+    /* 1. Disable default vector setting */
+    //__hyp_set_vectors(kvm_get_idmap_vector());
 
-	pgd_ptr = kvm_mmu_get_httbr();
-	stack_page = __this_cpu_read(kvm_arm_hyp_stack_page);
-	hyp_stack_ptr = stack_page + PAGE_SIZE;
-	vector_ptr = (unsigned long)kvm_get_hyp_vector();
+    /* 2. Get page table bases */
+    boot_pgd_ptr = kvm_mmu_get_boot_httbr();  // CRITICAL MISSING LINE
+    pgd_ptr = kvm_mmu_get_httbr();
 
-	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
-	__cpu_init_stage2();
+    /* 3. Configure hyp stack */
+    stack_page = hyp_stack_base;
+    hyp_stack_ptr = stack_page + PAGE_SIZE;   // Stack grows downward
+
+    /* 4. Get exception vectors */
+    vector_ptr = (unsigned long)__kvm_hyp_vector;  // Preferred over kvm_get_hyp_vector()
+
+    /* 5. Initialize EL2 with our hypervisor */
+    uh_init_kvm(
+        kvm_get_idmap_vector(),  // Physical address of hyp code
+        boot_pgd_ptr,            // Boot page table base
+        pgd_ptr,                 // Runtime page table base
+        hyp_stack_ptr,           // Stack pointer
+        vector_ptr               // Exception vector base
+    );
+
+    /* 6. Initialize stage-2, fingers crossed */
+    __cpu_init_stage2();
 }
+
 
 static void cpu_hyp_reinit(void)
 {
@@ -1282,10 +1304,10 @@ static int init_vhe_mode(void)
 /**
  * Inits Hyp-mode on all online CPUs
  */
-static int init_hyp_mode(void)
+static int preinit_status = -EINVAL;
+void preinit_hyp_mode(void)
 {
-	int cpu;
-	int err = 0;
+	int err;
 
 	/*
 	 * Allocate Hyp PGD and setup Hyp identity mapping
@@ -1295,14 +1317,97 @@ static int init_hyp_mode(void)
 		goto out_err;
 
 	/*
+	 * There used to be a comment here :3 anyways
+	 * Allocate stack pages for Hypervisor-mode
+	 */
+	// hyp_default_vectors = __hyp_get_vectors();
+
+	hyp_stack_base = __get_free_pages(GFP_KERNEL, 3);
+	if (!hyp_stack_base) {
+		err = -ENOMEM;
+		goto out_err;
+	}
+
+	/*
+	 * Map the Hyp-code called directly from the host
+	 */
+/*	err = create_hyp_mappings(__kvm_hyp_code_start, __kvm_hyp_code_end);
+	if (err) {
+		kvm_err("Cannot map world-switch code\n");
+		goto out_free_mappings;
+	}*/
+///
+/* Use native-style mapping for UH backdoor */
+	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start), kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
+	if (err) {
+	    kvm_err("Cannot map world-switch code\n");
+	    goto out_err;
+	}
+
+	err = create_hyp_mappings(kvm_ksym_ref(__start_rodata), kvm_ksym_ref(__end_rodata), PAGE_HYP_RO);
+	if (err) {
+	    kvm_err("Cannot map rodata section\n");
+	    goto out_err;
+	}
+
+	err = create_hyp_mappings(kvm_ksym_ref(__bss_start), kvm_ksym_ref(__bss_stop), PAGE_HYP_RO);
+	if (err) {
+	    kvm_err("Cannot map bss section\n");
+	    goto out_err;
+	}
+
+	err = kvm_map_vectors();
+	if (err) {
+	    kvm_err("Cannot map vectors\n");
+	    goto out_err;
+	}
+
+	/*
+	 * Map the Hyp stack
+	 */
+	err = create_hyp_mappings((void*)hyp_stack_base, (void*)(hyp_stack_base+8*PAGE_SIZE), PAGE_HYP);
+	if (err) {
+		kvm_err("Cannot map Hyp stack\n");
+		goto out_free_mappings;
+	}
+
+	cpu_init_hyp_mode(NULL);
+	preinit_status = 0;
+	kvm_info("Hyp mode pre-initialized successfully\n");
+	return;
+
+out_free_mappings:
+	free_hyp_pgds();
+	//TODO: free stack
+out_err:
+	preinit_status = err;
+	return;
+}
+
+/**
+ * Inits Hyp-mode on all online CPUs
+ */
+static int init_hyp_mode(void)
+{
+	int cpu;
+	int err = 0;
+
+	/*
 	 * It is probably enough to obtain the default on one
 	 * CPU. It's unlikely to be different on the others.
 	 */
-	hyp_default_vectors = __hyp_get_vectors();
+	hyp_default_vectors = 0xdeadbeefdeadbeef; //__hyp_get_vectors();
 
-	/*
-	 * Allocate stack pages for Hypervisor-mode
-	 */
+	if (preinit_status != 0) {
+		kvm_err("Hyp mode preinit failed, see above");
+		err = preinit_status;
+		goto out_err;
+	}
+#if 0
+	if (!stack_base) {
+		err = -ENOMEM;
+		goto out_free_stack_base;
+	}
 	for_each_possible_cpu(cpu) {
 		unsigned long stack_page;
 
@@ -1313,37 +1418,6 @@ static int init_hyp_mode(void)
 		}
 
 		per_cpu(kvm_arm_hyp_stack_page, cpu) = stack_page;
-	}
-
-	/*
-	 * Map the Hyp-code called directly from the host
-	 */
-	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
-				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
-	if (err) {
-		kvm_err("Cannot map world-switch code\n");
-		goto out_err;
-	}
-
-	err = create_hyp_mappings(kvm_ksym_ref(__start_rodata),
-				  kvm_ksym_ref(__end_rodata), PAGE_HYP_RO);
-	if (err) {
-		kvm_err("Cannot map rodata section\n");
-		goto out_err;
-	}
-
-	err = create_hyp_mappings(kvm_ksym_ref(__bss_start),
-				  kvm_ksym_ref(__bss_stop), PAGE_HYP_RO);
-	if (err) {
-		kvm_err("Cannot map bss section\n");
-		goto out_err;
-	}
-
-
-	err = kvm_map_vectors();
-	if (err) {
-		kvm_err("Cannot map vectors\n");
-		goto out_err;
 	}
 
 	/*
@@ -1359,7 +1433,7 @@ static int init_hyp_mode(void)
 			goto out_err;
 		}
 	}
-
+#endif
 	for_each_possible_cpu(cpu) {
 		kvm_cpu_context_t *cpu_ctxt;
 
@@ -1383,10 +1457,16 @@ static int init_hyp_mode(void)
 	return 0;
 
 out_err:
-	teardown_hyp_mode();
 	kvm_err("error initializing Hyp mode: %d\n", err);
 	return err;
 }
+
+
+
+
+
+
+
 
 static void check_kvm_target_cpu(void *ret)
 {
