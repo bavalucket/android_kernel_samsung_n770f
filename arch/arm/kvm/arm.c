@@ -43,6 +43,8 @@
 #include <asm/kvm_arm.h>
 #include <asm/kvm_asm.h>
 #include <asm/kvm_mmu.h>
+#include <linux/arm.h> // wrapper for preinit_hyp_mode
+#include <linux/uh-kvm.h> // uh_init_kvm
 #include <asm/kvm_emulate.h>
 #include <asm/kvm_coproc.h>
 #include <asm/sections.h>
@@ -1080,6 +1082,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
 	}
 }
 
+static unsigned long hyp_stack_base;
+
 static void cpu_init_hyp_mode(void *dummy)
 {
 	phys_addr_t pgd_ptr;
@@ -1088,14 +1092,15 @@ static void cpu_init_hyp_mode(void *dummy)
 	unsigned long vector_ptr;
 
 	/* Switch from the HYP stub to our own HYP init vector */
-	__hyp_set_vectors(kvm_get_idmap_vector());
+	//__hyp_set_vectors(kvm_get_idmap_vector());
 
 	pgd_ptr = kvm_mmu_get_httbr();
-	stack_page = __this_cpu_read(kvm_arm_hyp_stack_page);
+	stack_page = hyp_stack_base; //__this_cpu_read(kvm_arm_hyp_stack_page);
 	hyp_stack_ptr = stack_page + PAGE_SIZE;
 	vector_ptr = (unsigned long)kvm_get_hyp_vector();
 
-	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
+	//__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
+	uh_init_kvm(kvm_get_idmap_vector(), pgd_ptr, hyp_stack_ptr, vector_ptr);
 	__cpu_init_stage2();
 }
 
@@ -1280,12 +1285,13 @@ static int init_vhe_mode(void)
 }
 
 /**
- * Inits Hyp-mode on all online CPUs
+ * JUST BOOT IM BEGGING
  */
-static int init_hyp_mode(void)
+static int preinit_status = -EINVAL;
+
+void preinit_hyp_mode(void)
 {
-	int cpu;
-	int err = 0;
+	int err;
 
 	/*
 	 * Allocate Hyp PGD and setup Hyp identity mapping
@@ -1295,24 +1301,12 @@ static int init_hyp_mode(void)
 		goto out_err;
 
 	/*
-	 * It is probably enough to obtain the default on one
-	 * CPU. It's unlikely to be different on the others.
-	 */
-	hyp_default_vectors = __hyp_get_vectors();
-
-	/*
 	 * Allocate stack pages for Hypervisor-mode
 	 */
-	for_each_possible_cpu(cpu) {
-		unsigned long stack_page;
-
-		stack_page = __get_free_page(GFP_KERNEL);
-		if (!stack_page) {
-			err = -ENOMEM;
-			goto out_err;
-		}
-
-		per_cpu(kvm_arm_hyp_stack_page, cpu) = stack_page;
+	hyp_stack_base = __get_free_pages(GFP_KERNEL, 3);
+	if (!hyp_stack_base) {
+		err = -ENOMEM;
+		goto out_err;
 	}
 
 	/*
@@ -1345,22 +1339,57 @@ static int init_hyp_mode(void)
 		kvm_err("Cannot map vectors\n");
 		goto out_err;
 	}
+	/// End of mapping codeblock
+
 
 	/*
-	 * Map the Hyp stack pages
+	 * Map the Hyp stack
 	 */
-	for_each_possible_cpu(cpu) {
-		char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
-		err = create_hyp_mappings(stack_page, stack_page + PAGE_SIZE,
-					  PAGE_HYP);
 
-		if (err) {
-			kvm_err("Cannot map hyp stack\n");
-			goto out_err;
-		}
+	err = create_hyp_mappings((void*)hyp_stack_base, (void*)(hyp_stack_base+8*PAGE_SIZE), PAGE_HYP);
+	if (err) {
+		kvm_err("Cannot map Hyp stack\n");
+		goto out_free_mappings;
 	}
 
-	for_each_possible_cpu(cpu) {
+
+	cpu_init_hyp_mode(NULL);
+	preinit_status = 0;
+	kvm_info("Hyp mode pre-initialized successfully\n");
+	return;
+
+out_free_mappings:
+	free_hyp_pgds();
+	//TODO: free stack
+out_err:
+	preinit_status = err;
+	return;
+
+
+}
+
+
+/**
+ * Inits Hyp-mode on all online CPUs
+ */
+static int init_hyp_mode(void)
+{
+	int cpu;
+	int err = 0;
+
+	/*
+	 * It is probably enough to obtain the default on one
+	 * CPU. It's unlikely to be different on the others.
+	 */
+	hyp_default_vectors = 0xdeadbeefdeadbeef; //__hyp_get_vectors();
+
+	if (preinit_status != 0) {
+		kvm_err("Hyp mode preinit failed, see above");
+		err = preinit_status;
+		goto out_err;
+	}
+
+	for_each_possible_cpu(cpu) { //TODO: Deal with this, dont let it get eaten by if 0
 		kvm_cpu_context_t *cpu_ctxt;
 
 		cpu_ctxt = per_cpu_ptr(&kvm_host_cpu_state, cpu);

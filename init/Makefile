@@ -15,6 +15,10 @@ ifneq ($(CONFIG_ARCH_INIT_TASK),y)
 obj-y                          += init_task.o
 endif
 
+ifeq ($(CONFIG_KVM), y)
+obj-y += _uh.o uh-kvm.o
+endif
+
 mounts-y			:= do_mounts.o
 mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
 mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o

@@ -29,6 +29,7 @@
 	.align	11
 
 ENTRY(__kvm_hyp_init)
+#if 0
 	ventry	__invalid		// Synchronous EL2t
 	ventry	__invalid		// IRQ EL2t
 	ventry	__invalid		// FIQ EL2t
@@ -51,6 +52,12 @@ ENTRY(__kvm_hyp_init)
 
 __invalid:
 	b	.
+#endif
+
+exynos_entry:
+ldr x2, [x0, #16]
+ldr x1, [x0, #8]
+ldr x0, [x0]
 
 	/*
 	 * x0: HYP pgd
@@ -118,12 +125,21 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
 	kern_hyp_va	x2
 	msr	vbar_el2, x2
 
+	//insertion begin for SMC backdoor
+	mov x0, #0
+	msr vttbr_el2, x0
+	//insertion end for SMC backdoor
+
 	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
 	mrs	x1, tpidr_el1
 	msr	tpidr_el2, x1
 
 	/* Hello, World! */
-	eret
+	//eret
+	ldr x0, =0xc2000401
+	mov x1, 0
+	smc #0
+
 ENDPROC(__kvm_hyp_init)
 
 	/*

@@ -93,6 +93,10 @@
 #include <linux/sec_ext.h>
 #endif
 
+#ifdef CONFIG_KVM
+#include <linux/arm.h> // ARM with KVM preinit code
+#endif
+
 #ifdef CONFIG_UH
 #include <linux/uh.h>
 #ifdef CONFIG_UH_RKP
@@ -763,6 +767,9 @@ asmlinkage __visible void __init start_kernel(void)
 	sort_main_extable();
 	trap_init();
 	mm_init();
+#ifdef CONFIG_KVM
+	preinit_hyp_mode();
+#endif
 #ifdef CONFIG_UH
 	uh_init();
 #ifdef CONFIG_UH_RKP
