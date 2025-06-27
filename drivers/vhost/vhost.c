@@ -1354,7 +1354,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, int ioctl, void __user *argp)
 		/* Forget the cached index value. */
 		vq->avail_idx = vq->last_avail_idx;
 		break;
-	case VHOST_GET_VRING_BASE:
+	case (unsigned int)VHOST_GET_VRING_BASE:
 		s.index = idx;
 		s.num = vq->last_avail_idx;
 		if (copy_to_user(argp, &s, sizeof s))
