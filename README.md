@@ -23,8 +23,6 @@ Enjoy!
 
 - SuSfs is enabled for production builds
 
-- Stock rom users might face some problems with Overlayfs
-
 
 
 # Compilation:
