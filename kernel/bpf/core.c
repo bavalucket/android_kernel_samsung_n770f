@@ -104,8 +104,6 @@ struct bpf_prog *bpf_prog_alloc(unsigned int size, gfp_t gfp_extra_flags)
 
 	INIT_LIST_HEAD_RCU(&fp->aux->ksym_lnode);
 
-	INIT_LIST_HEAD_RCU(&fp->aux->ksym_lnode);
-
 	return fp;
 }
 EXPORT_SYMBOL_GPL(bpf_prog_alloc);
