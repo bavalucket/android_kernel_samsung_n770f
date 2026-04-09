@@ -763,16 +763,6 @@ static inline void bpf_jit_binary_unlock_ro(struct bpf_binary_header *hdr)
 {
 	WARN_ON_ONCE(set_memory_rw((unsigned long)hdr, hdr->pages));
 }
-
-static inline void bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-{
-	set_memory_ro((unsigned long)hdr, hdr->pages);
-}
-
-static inline void bpf_jit_binary_unlock_ro(struct bpf_binary_header *hdr)
-{
-	set_memory_rw((unsigned long)hdr, hdr->pages);
-}
 #else
 static inline void bpf_prog_lock_ro(struct bpf_prog *fp)
 {
