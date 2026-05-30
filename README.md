@@ -1,3 +1,7 @@
+# Current state 🟡
+
+This project is temporarily paused due to a lack of testers. I've decided to stop publishing builds (for now) due to the fact that this project doesn't have any testers currently running stock oneui 5.1. This is not an EOL statement, stay tuned for the future.
+
 # About
 
 This repository contains a community-supported kernel for the Galaxy Note 10 Lite, compatible with KernelSU-Next.
